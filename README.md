@@ -162,11 +162,6 @@ Para deployment rápido, usa el script automatizado:
 wget https://raw.githubusercontent.com/nodonorteit/wspbot/main/scripts/deployment/deploy.sh
 chmod +x deploy.sh
 ./deploy.sh
-
-# Configurar Plesk (opcional - usar configuración manual es más seguro)
-wget https://raw.githubusercontent.com/nodonorteit/wspbot/main/scripts/deployment/configure-plesk.sh
-chmod +x configure-plesk.sh
-./configure-plesk.sh
 ```
 
 ## 🌐 URLs

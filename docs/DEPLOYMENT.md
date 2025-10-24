@@ -32,16 +32,7 @@ sudo apt update && sudo apt upgrade -y
 sudo apt install -y curl wget git unzip software-properties-common
 ```
 
-### 2. Automated Deployment
-
-```bash
-# Download and run deployment script
-wget https://raw.githubusercontent.com/nodonorteit/wspbot/main/scripts/deployment/deploy.sh
-chmod +x deploy.sh
-./deploy.sh
-```
-
-### 3. Manual Configuration
+### 2. Manual Configuration
 
 #### Configure Environment Variables
 ```bash
