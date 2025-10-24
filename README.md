@@ -68,6 +68,20 @@ wspbot-microservices/
 
 ## 🗄️ Base de Datos
 
+El sistema utiliza **MySQL 8.0** como base de datos principal. Se puede configurar de dos maneras:
+
+### Opción 1: Base de Datos del Hosting (Recomendado para Producción)
+- Utiliza la infraestructura de base de datos del hosting
+- Gestión centralizada desde Plesk
+- Backups automáticos incluidos
+- Mayor seguridad y escalabilidad
+
+### Opción 2: Contenedor MySQL (Desarrollo)
+- Contenedor Docker para desarrollo local
+- Incluye phpMyAdmin para gestión
+- Configuración automática con Docker Compose
+
+### Características:
 - **MySQL 8.0**: Datos principales (tenants, usuarios, turnos)
 - **Redis**: Cache, sesiones, colas de trabajo
 - **ClickHouse**: Analytics y métricas (opcional)
@@ -127,13 +141,29 @@ docker-compose down
 ```
 
 ### Deployment en Ubuntu con Plesk
+
+#### Configuración Manual desde Panel de Plesk (Recomendado)
+
+Para una configuración más segura y controlada, puedes configurar todo manualmente desde el panel de Plesk:
+
+1. **Configurar Base de Datos**: Crear bases de datos desde el panel de Plesk
+2. **Crear Subdominios**: Configurar dominios y subdominios
+3. **Configurar SSL**: Habilitar Let's Encrypt automáticamente
+4. **Configurar Proxy**: Reverse proxy para servicios
+
+📖 **Guía Completa**: [Configuración Manual de Plesk](docs/PLESK_MANUAL_CONFIG.md)
+
+#### Deployment Automático
+
+Para deployment rápido, usa el script automatizado:
+
 ```bash
-# Deployment automatizado
+# Descargar y ejecutar script de deployment
 wget https://raw.githubusercontent.com/nodonorteit/wspbot/main/scripts/deployment/deploy.sh
 chmod +x deploy.sh
 ./deploy.sh
 
-# Configurar Plesk
+# Configurar Plesk (opcional - usar configuración manual es más seguro)
 wget https://raw.githubusercontent.com/nodonorteit/wspbot/main/scripts/deployment/configure-plesk.sh
 chmod +x configure-plesk.sh
 ./configure-plesk.sh
@@ -145,7 +175,7 @@ chmod +x configure-plesk.sh
 - **Admin Panel**: http://localhost:3006
 - **Tenant Dashboard**: http://localhost:3007
 - **API Docs**: http://localhost:8080/docs
-- **phpMyAdmin**: http://localhost:8081 (development only)
+- **phpMyAdmin**: http://localhost:8081 (desarrollo - solo con contenedor MySQL)
 
 ## 🔐 Autenticación Multi-Tenant
 

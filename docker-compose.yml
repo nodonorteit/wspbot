@@ -16,24 +16,24 @@ services:
     networks:
       - wspbot-network
 
-  # MySQL Database
-  mysql:
-    image: mysql:8.0
-    container_name: wspbot-mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: wspbot
-      MYSQL_USER: wspbot
-      MYSQL_PASSWORD: password
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - ./infrastructure/mysql/init:/docker-entrypoint-initdb.d
-    restart: unless-stopped
-    networks:
-      - wspbot-network
-    command: --default-authentication-plugin=mysql_native_password
+  # MySQL Database - Using hosting database instead of container
+  # mysql:
+  #   image: mysql:8.0
+  #   container_name: wspbot-mysql
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: rootpassword
+  #     MYSQL_DATABASE: wspbot
+  #     MYSQL_USER: wspbot
+  #     MYSQL_PASSWORD: password
+  #   ports:
+  #     - "3306:3306"
+  #   volumes:
+  #     - mysql_data:/var/lib/mysql
+  #     - ./infrastructure/mysql/init:/docker-entrypoint-initdb.d
+  #   restart: unless-stopped
+  #   networks:
+  #     - wspbot-network
+  #   command: --default-authentication-plugin=mysql_native_password
 
   # Redis Cache & Queue
   redis:
@@ -84,16 +84,15 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3001
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_NAME=wspbot_auth
-      - DB_USER=wspbot
-      - DB_PASSWORD=password
+      - DB_HOST=${DB_HOST:-localhost}
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_NAME=${DB_NAME:-wspbot_auth}
+      - DB_USER=${DB_USER:-wspbot}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
       - JWT_SECRET=your-super-secret-jwt-key-change-in-production
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     depends_on:
-      - mysql
       - redis
     restart: unless-stopped
     networks:
@@ -110,15 +109,14 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3002
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_NAME=wspbot_tenants
-      - DB_USER=wspbot
-      - DB_PASSWORD=password
+      - DB_HOST=${DB_HOST:-localhost}
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_NAME=${DB_NAME:-wspbot_tenants}
+      - DB_USER=${DB_USER:-wspbot}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     depends_on:
-      - mysql
       - redis
     restart: unless-stopped
     networks:
@@ -135,15 +133,14 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3003
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_NAME=wspbot_turns
-      - DB_USER=wspbot
-      - DB_PASSWORD=password
+      - DB_HOST=${DB_HOST:-localhost}
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_NAME=${DB_NAME:-wspbot_turns}
+      - DB_USER=${DB_USER:-wspbot}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     depends_on:
-      - mysql
       - redis
     restart: unless-stopped
     networks:
@@ -181,39 +178,38 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3005
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_NAME=wspbot_notifications
-      - DB_USER=wspbot
-      - DB_PASSWORD=password
+      - DB_HOST=${DB_HOST:-localhost}
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_NAME=${DB_NAME:-wspbot_notifications}
+      - DB_USER=${DB_USER:-wspbot}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - WHATSAPP_SERVICE_URL=http://whatsapp-service:3004
     depends_on:
-      - mysql
       - redis
       - whatsapp-service
     restart: unless-stopped
     networks:
       - wspbot-network
 
-  # phpMyAdmin (Development only)
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: wspbot-phpmyadmin
-    ports:
-      - "8081:80"
-    environment:
-      PMA_HOST: mysql
-      PMA_USER: wspbot
-      PMA_PASSWORD: password
-    depends_on:
-      - mysql
-    restart: unless-stopped
-    networks:
-      - wspbot-network
-    profiles:
-      - dev
+  # phpMyAdmin (Development only) - Disabled when using hosting database
+  # phpmyadmin:
+  #   image: phpmyadmin/phpmyadmin
+  #   container_name: wspbot-phpmyadmin
+  #   ports:
+  #     - "8081:80"
+  #   environment:
+  #     PMA_HOST: mysql
+  #     PMA_USER: wspbot
+  #     PMA_PASSWORD: password
+  #   depends_on:
+  #     - mysql
+  #   restart: unless-stopped
+  #   networks:
+  #     - wspbot-network
+  #   profiles:
+  #     - dev
 
   # Admin Panel Frontend
   admin-panel:
@@ -234,7 +230,6 @@ services:
 
 volumes:
   waha_data:
-  mysql_data:
   redis_data:
 
 networks:

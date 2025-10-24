@@ -72,6 +72,93 @@ sed -i "s/your-secure-root-password/$MYSQL_ROOT_PASSWORD/g" .env
 sed -i "s/your-super-secret-jwt-key-change-in-production-make-it-very-long-and-random/$JWT_SECRET/g" .env
 ```
 
+## 🗄️ Configuración de Base de Datos
+
+### Opción 1: Base de Datos del Hosting (Recomendado)
+
+Esta es la opción recomendada para producción, ya que utiliza la infraestructura de base de datos del hosting:
+
+#### Ventajas:
+- **Gestión Centralizada**: Administra todas las bases de datos desde Plesk
+- **Backups Automáticos**: Los backups se incluyen en el plan de hosting
+- **Seguridad Integrada**: Firewall y seguridad gestionados por Plesk
+- **Escalabilidad**: Fácil escalado según las necesidades
+- **Monitoreo**: Herramientas de monitoreo integradas
+- **Soporte**: Soporte técnico del proveedor de hosting
+- **Costo**: No necesitas recursos adicionales para contenedores de base de datos
+
+#### Configuración desde Plesk:
+1. Ve a **"Bases de Datos"** en el panel de Plesk
+2. Crea las siguientes bases de datos:
+   - `wspbot_auth` - Servicio de autenticación
+   - `wspbot_tenants` - Gestión de tenants
+   - `wspbot_turns` - Sistema de turnos
+   - `wspbot_whatsapp` - Datos de WhatsApp
+   - `wspbot_notifications` - Sistema de notificaciones
+   - `wspbot_analytics` - Análisis y métricas
+3. Crea un usuario `wspbot_user` con permisos completos en todas las bases de datos
+4. Actualiza el archivo `.env` con las credenciales de la base de datos
+
+#### Variables de Entorno para Base de Datos del Hosting:
+```bash
+# ===== DATABASE CONFIGURATION (Hosting Database) =====
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=wspbot_auth
+DB_USER=wspbot_user
+DB_PASSWORD=tu_contraseña_de_base_de_datos
+
+# Database names for each service
+DB_NAME_AUTH=wspbot_auth
+DB_NAME_TENANTS=wspbot_tenants
+DB_NAME_TURNS=wspbot_turns
+DB_NAME_WHATSAPP=wspbot_whatsapp
+DB_NAME_NOTIFICATIONS=wspbot_notifications
+DB_NAME_ANALYTICS=wspbot_analytics
+```
+
+### Opción 2: Contenedor MySQL (Desarrollo)
+
+Para desarrollo local, puedes usar un contenedor MySQL:
+
+#### Configuración:
+1. Descomenta el servicio `mysql` en `docker-compose.yml`
+2. Descomenta el servicio `phpmyadmin` para desarrollo
+3. Usa las variables de entorno por defecto
+
+#### Variables de Entorno para Contenedor MySQL:
+```bash
+# ===== DATABASE CONFIGURATION =====
+DB_HOST=mysql
+DB_PORT=3306
+DB_NAME=wspbot_auth
+DB_USER=wspbot
+DB_PASSWORD=password
+```
+
+### Crear Bases de Datos
+El sistema requiere múltiples bases de datos para cada microservicio:
+
+```sql
+-- Ejecutar en MySQL
+CREATE DATABASE IF NOT EXISTS wspbot_auth;
+CREATE DATABASE IF NOT EXISTS wspbot_tenants;
+CREATE DATABASE IF NOT EXISTS wspbot_turns;
+CREATE DATABASE IF NOT EXISTS wspbot_whatsapp;
+CREATE DATABASE IF NOT EXISTS wspbot_notifications;
+CREATE DATABASE IF NOT EXISTS wspbot_analytics;
+
+-- Crear usuario
+CREATE USER 'wspbot'@'%' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON wspbot_auth.* TO 'wspbot'@'%';
+GRANT ALL PRIVILEGES ON wspbot_tenants.* TO 'wspbot'@'%';
+GRANT ALL PRIVILEGES ON wspbot_turns.* TO 'wspbot'@'%';
+GRANT ALL PRIVILEGES ON wspbot_whatsapp.* TO 'wspbot'@'%';
+GRANT ALL PRIVILEGES ON wspbot_notifications.* TO 'wspbot'@'%';
+GRANT ALL PRIVILEGES ON wspbot_analytics.* TO 'wspbot'@'%';
+FLUSH PRIVILEGES;
+```
+
 ## 🌐 Plesk Configuration
 
 ### 1. Create Domains
