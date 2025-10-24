@@ -126,6 +126,19 @@ docker-compose logs -f
 docker-compose down
 ```
 
+### Deployment en Ubuntu con Plesk
+```bash
+# Deployment automatizado
+wget https://raw.githubusercontent.com/nodonorteit/wspbot/main/scripts/deployment/deploy.sh
+chmod +x deploy.sh
+./deploy.sh
+
+# Configurar Plesk
+wget https://raw.githubusercontent.com/nodonorteit/wspbot/main/scripts/deployment/configure-plesk.sh
+chmod +x configure-plesk.sh
+./configure-plesk.sh
+```
+
 ## 🌐 URLs
 
 - **API Gateway**: http://localhost:8080

@@ -1,0 +1,46 @@
+# Traefik configuration for WhatsApp Bot Multi-Tenant
+# Production configuration for Ubuntu with Plesk
+
+# Global configuration
+[global]
+  checkNewVersion = false
+  sendAnonymousUsage = false
+
+# API and dashboard configuration
+[api]
+  dashboard = true
+  insecure = false
+
+# Entry points
+[entryPoints]
+  [entryPoints.web]
+    address = ":80"
+    [entryPoints.web.http.redirections.entrypoint]
+      to = "websecure"
+      scheme = "https"
+
+  [entryPoints.websecure]
+    address = ":443"
+
+# Certificate resolvers
+[certificatesResolvers.letsencrypt.acme]
+  email = "admin@yourdomain.com"
+  storage = "/data/acme.json"
+  [certificatesResolvers.letsencrypt.acme.tlsChallenge]
+
+# Providers
+[providers.docker]
+  exposedByDefault = false
+  network = "wspbot-network"
+
+# Logging
+[log]
+  level = "INFO"
+
+[accessLog]
+  format = "json"
+
+# Metrics
+[metrics.prometheus]
+  addEntryPointsLabels = true
+  addServicesLabels = true
