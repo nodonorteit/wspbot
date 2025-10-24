@@ -40,9 +40,9 @@ export const config: ServiceConfig & {
   
   database: {
     host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '5432', 10),
+    port: parseInt(process.env.DB_PORT || '3306', 10),
     database: process.env.DB_NAME || 'wspbot_auth',
-    username: process.env.DB_USER || 'postgres',
+    username: process.env.DB_USER || 'wspbot',
     password: process.env.DB_PASSWORD || 'password'
   }
 };

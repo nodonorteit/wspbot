@@ -68,7 +68,7 @@ wspbot-microservices/
 
 ## 🗄️ Base de Datos
 
-- **PostgreSQL**: Datos principales (tenants, usuarios, turnos)
+- **MySQL 8.0**: Datos principales (tenants, usuarios, turnos)
 - **Redis**: Cache, sesiones, colas de trabajo
 - **ClickHouse**: Analytics y métricas (opcional)
 
@@ -76,7 +76,7 @@ wspbot-microservices/
 
 - **Backend**: Node.js + TypeScript + Express
 - **Frontend**: React + TypeScript + Tailwind CSS
-- **Database**: PostgreSQL + Prisma ORM
+- **Database**: MySQL 8.0 + Prisma ORM
 - **Cache**: Redis
 - **Queue**: Bull Queue + Redis
 - **Monitoring**: Prometheus + Grafana
@@ -132,6 +132,7 @@ docker-compose down
 - **Admin Panel**: http://localhost:3006
 - **Tenant Dashboard**: http://localhost:3007
 - **API Docs**: http://localhost:8080/docs
+- **phpMyAdmin**: http://localhost:8081 (development only)
 
 ## 🔐 Autenticación Multi-Tenant
 

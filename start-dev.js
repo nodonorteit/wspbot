@@ -8,7 +8,7 @@ console.log('🚀 Starting WhatsApp Bot Multi-Tenant Development Environment...\
 // Services to start
 const services = [
   { name: 'WAHA', command: 'docker', args: ['run', '-it', '--rm', '-p', '3000:3000', '--name', 'waha', 'devlikeapro/waha'] },
-  { name: 'PostgreSQL', command: 'docker', args: ['run', '-d', '-p', '5432:5432', '--name', 'wspbot-postgres', '-e', 'POSTGRES_DB=wspbot', '-e', 'POSTGRES_USER=postgres', '-e', 'POSTGRES_PASSWORD=password', 'postgres:15-alpine'] },
+  { name: 'MySQL', command: 'docker', args: ['run', '-d', '-p', '3306:3306', '--name', 'wspbot-mysql', '-e', 'MYSQL_ROOT_PASSWORD=rootpassword', '-e', 'MYSQL_DATABASE=wspbot', '-e', 'MYSQL_USER=wspbot', '-e', 'MYSQL_PASSWORD=password', 'mysql:8.0'] },
   { name: 'Redis', command: 'docker', args: ['run', '-d', '-p', '6379:6379', '--name', 'wspbot-redis', 'redis:7-alpine'] },
   { name: 'Auth Service', command: 'npm', args: ['run', 'dev'], cwd: path.join(__dirname, 'services/auth-service') },
   { name: 'WhatsApp Service', command: 'npm', args: ['run', 'dev'], cwd: path.join(__dirname, 'services/whatsapp-service') }
@@ -43,7 +43,7 @@ setTimeout(() => {
   console.log('├── WAHA API: http://localhost:3000');
   console.log('├── Auth Service: http://localhost:3001');
   console.log('├── WhatsApp Service: http://localhost:3004');
-  console.log('├── PostgreSQL: localhost:5432');
+  console.log('├── MySQL: localhost:3306');
   console.log('└── Redis: localhost:6379');
   
   console.log('\n📱 To connect WhatsApp:');
@@ -61,10 +61,10 @@ process.on('SIGINT', () => {
   // Stop Docker containers
   const stopCommands = [
     ['docker', ['stop', 'waha']],
-    ['docker', ['stop', 'wspbot-postgres']],
+    ['docker', ['stop', 'wspbot-mysql']],
     ['docker', ['stop', 'wspbot-redis']],
     ['docker', ['rm', 'waha']],
-    ['docker', ['rm', 'wspbot-postgres']],
+    ['docker', ['rm', 'wspbot-mysql']],
     ['docker', ['rm', 'wspbot-redis']]
   ];
   
