@@ -1,0 +1,59 @@
+{
+  "name": "wspbot-microservices",
+  "version": "1.0.0",
+  "description": "WhatsApp Bot Multi-Tenant - Microservices Architecture",
+  "private": true,
+  "workspaces": [
+    "services/*",
+    "frontend/*",
+    "shared/*"
+  ],
+  "scripts": {
+    "install:all": "npm install && npm run install:services && npm run install:frontend",
+    "install:services": "npm install --workspace=services/*",
+    "install:frontend": "npm install --workspace=frontend/*",
+    "dev": "concurrently \"npm run dev:services\" \"npm run dev:frontend\"",
+    "dev:services": "concurrently \"npm run dev --workspace=services/api-gateway\" \"npm run dev --workspace=services/auth-service\" \"npm run dev --workspace=services/tenant-service\" \"npm run dev --workspace=services/turns-service\" \"npm run dev --workspace=services/whatsapp-service\" \"npm run dev --workspace=services/notifications-service\"",
+    "dev:frontend": "concurrently \"npm run dev --workspace=frontend/admin-panel\" \"npm run dev --workspace=frontend/tenant-dashboard\"",
+    "build": "npm run build:services && npm run build:frontend",
+    "build:services": "npm run build --workspace=services/*",
+    "build:frontend": "npm run build --workspace=frontend/*",
+    "start:prod": "npm run start:prod --workspace=services/*",
+    "test": "npm run test --workspace=services/* --workspace=frontend/*",
+    "lint": "npm run lint --workspace=services/* --workspace=frontend/*",
+    "type-check": "npm run type-check --workspace=services/* --workspace=frontend/*",
+    "clean": "npm run clean --workspace=services/* --workspace=frontend/*",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "db:migrate": "npm run db:migrate --workspace=shared/database",
+    "db:seed": "npm run db:seed --workspace=shared/database",
+    "db:reset": "npm run db:reset --workspace=shared/database"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.54.0",
+    "nodemon": "^3.0.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "microservices",
+    "multi-tenant",
+    "nodejs",
+    "typescript",
+    "react"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
