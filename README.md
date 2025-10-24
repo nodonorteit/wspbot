@@ -88,8 +88,8 @@ wspbot-microservices/
 ### Desarrollo Rápido
 ```bash
 # Clonar repositorio
-git clone <repo-url>
-cd wspbot-microservices
+git clone https://github.com/nodonorteit/wspbot.git
+cd wspbot
 
 # Instalar dependencias
 npm install
@@ -128,10 +128,10 @@ docker-compose down
 
 ## 🌐 URLs
 
-- **API Gateway**: http://localhost:3000
-- **Admin Panel**: http://localhost:3000/admin
-- **Tenant Dashboard**: http://localhost:3000/tenant/:slug
-- **API Docs**: http://localhost:3000/docs
+- **API Gateway**: http://localhost:8080
+- **Admin Panel**: http://localhost:3006
+- **Tenant Dashboard**: http://localhost:3007
+- **API Docs**: http://localhost:8080/docs
 
 ## 🔐 Autenticación Multi-Tenant
 
