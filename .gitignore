@@ -16,6 +16,12 @@ dist/
 build/
 *.tsbuildinfo
 
+# Compiled files
+**/*.d.ts
+**/*.d.ts.map
+**/*.js
+**/*.js.map
+
 # Logs
 logs/
 *.log
@@ -97,6 +103,9 @@ Thumbs.db
 
 # Docker
 .dockerignore
+
+# WAHA data
+waha_data/
 
 # Database
 *.db

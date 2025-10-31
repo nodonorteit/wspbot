@@ -2,7 +2,7 @@ import axios from 'axios';
 import QRCode from 'qrcode';
 import { config } from '../config';
 import { logger } from '../utils/logger';
-import { WhatsAppSession } from '../../../shared/types';
+import { WhatsAppSession } from '@wspbot/shared-types';
 
 export class SessionManager {
   private sessions: Map<string, WhatsAppSession> = new Map();

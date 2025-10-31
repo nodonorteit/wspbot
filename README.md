@@ -1,239 +1,155 @@
-# WhatsApp Bot Multi-Tenant - Microservices Architecture
+# WSPBot - WhatsApp Bot Multi-Tenant
 
-Sistema completo de gestión de turnos con WhatsApp usando arquitectura de microservicios.
+Sistema de gestión de turnos con WhatsApp - Arquitectura monolítica simplificada.
 
 ## 🏗️ Arquitectura
 
 ```
-wspbot-microservices/
+wspbot/
 ├── services/
-│   ├── api-gateway/          # API Gateway (Kong/Nginx)
 │   ├── auth-service/         # Autenticación y autorización
-│   ├── tenant-service/       # Gestión de tenants
-│   ├── turns-service/        # Gestión de turnos
-│   ├── whatsapp-service/     # Integración con WAHA
-│   ├── notifications-service/ # Notificaciones y scheduling
-│   └── analytics-service/    # Analytics y reportes
-├── frontend/
-│   ├── admin-panel/          # Panel de administración
-│   ├── tenant-dashboard/     # Dashboard por tenant
-│   └── mobile-app/           # App móvil (opcional)
+│   └── whatsapp-service/     # Integración con WAHA
 ├── shared/
-│   ├── types/                # Tipos TypeScript compartidos
-│   ├── utils/                # Utilidades compartidas
-│   └── database/             # Configuración de BD
+│   └── types/                # Tipos TypeScript compartidos
 ├── infrastructure/
-│   ├── docker/               # Docker configs
-│   ├── kubernetes/           # K8s manifests
-│   └── monitoring/           # Prometheus, Grafana
-└── docs/                     # Documentación
+│   ├── mysql/                # Configuración MySQL
+│   └── redis/                # Configuración Redis
+├── docs/                     # Documentación
+├── docker-compose.yml        # Orquestación Docker
+├── Dockerfile               # Imagen monolítica
+└── package.json             # Configuración npm workspaces
 ```
 
-## 🚀 Servicios
+## 🚀 Inicio Rápido
 
-### 1. **API Gateway**
-- **Tecnología**: Kong/Nginx + Express
-- **Responsabilidad**: Routing, rate limiting, autenticación
-- **Puerto**: 3000
+### Despliegue en Servidor (Producción)
 
-### 2. **Auth Service**
-- **Tecnología**: Node.js + Express + JWT
-- **Responsabilidad**: Autenticación, autorización, gestión de usuarios
-- **Puerto**: 3001
-
-### 3. **Tenant Service**
-- **Tecnología**: Node.js + Express + Prisma
-- **Responsabilidad**: CRUD de tenants, configuración multi-tenant
-- **Puerto**: 3002
-
-### 4. **Turns Service**
-- **Tecnología**: Node.js + Express + Prisma
-- **Responsabilidad**: Gestión de turnos, disponibilidad, reservas
-- **Puerto**: 3003
-
-### 5. **WhatsApp Service**
-- **Tecnología**: Node.js + Express + WAHA API
-- **Responsabilidad**: Integración con WhatsApp, envío de mensajes
-- **Puerto**: 3004
-
-### 6. **Notifications Service**
-- **Tecnología**: Node.js + Express + Bull Queue
-- **Responsabilidad**: Notificaciones programadas, emails, SMS
-- **Puerto**: 3005
-
-### 7. **Analytics Service**
-- **Tecnología**: Node.js + Express + ClickHouse
-- **Responsabilidad**: Métricas, reportes, dashboards
-- **Puerto**: 3006
-
-## 🗄️ Base de Datos
-
-El sistema utiliza **MySQL 8.0** como base de datos principal. Se puede configurar de dos maneras:
-
-### Opción 1: Base de Datos del Hosting (Recomendado para Producción)
-- Utiliza la infraestructura de base de datos del hosting
-- Gestión centralizada desde Plesk
-- Backups automáticos incluidos
-- Mayor seguridad y escalabilidad
-
-### Opción 2: Contenedor MySQL (Desarrollo)
-- Contenedor Docker para desarrollo local
-- Incluye phpMyAdmin para gestión
-- Configuración automática con Docker Compose
-
-### Características:
-- **MySQL 8.0**: Datos principales (tenants, usuarios, turnos)
-- **Redis**: Cache, sesiones, colas de trabajo
-- **ClickHouse**: Analytics y métricas (opcional)
-
-## 🔧 Tecnologías
-
-- **Backend**: Node.js + TypeScript + Express
-- **Frontend**: React + TypeScript + Tailwind CSS
-- **Database**: MySQL 8.0 + Prisma ORM
-- **Cache**: Redis
-- **Queue**: Bull Queue + Redis
-- **Monitoring**: Prometheus + Grafana
-- **Container**: Docker + Docker Compose
-- **Orchestration**: Kubernetes (opcional)
-
-## 📦 Instalación
-
-### Desarrollo Rápido
 ```bash
-# Clonar repositorio
-git clone https://github.com/nodonorteit/wspbot.git
+# 1. Clonar repositorio
+git clone https://github.com/TU-USUARIO/wspbot.git
 cd wspbot
 
-# Instalar dependencias
-npm install
-
-# Configurar variables de entorno
+# 2. Configurar
+./setup.sh
 cp env.example .env
+nano .env  # Editar variables
 
-# Iniciar entorno de desarrollo
-node start-dev.js
+# 3. Desplegar
+./deploy.sh
 ```
 
-### Desarrollo Completo
+📖 **[Ver guía completa de despliegue →](./DEPLOYMENT.md)**
+
+### Usando Docker (Local)
+
 ```bash
-# Instalar dependencias de todos los servicios
-npm run install:all
-
-# Iniciar todos los servicios
-npm run dev
-
-# O iniciar servicios individualmente
-npm run dev:services
-npm run dev:frontend
-```
-
-### Producción con Docker
-```bash
-# Construir y ejecutar todos los servicios
+# Construir y levantar todos los servicios
 docker-compose up -d
 
 # Ver logs
 docker-compose logs -f
 
-# Parar servicios
+# Detener servicios
 docker-compose down
 ```
 
-### Deployment en Ubuntu con Plesk
-
-#### Configuración Manual desde Panel de Plesk (Recomendado)
-
-Para una configuración más segura y controlada, puedes configurar todo manualmente desde el panel de Plesk:
-
-1. **Configurar Base de Datos**: Crear bases de datos desde el panel de Plesk
-2. **Crear Subdominios**: Configurar dominios y subdominios
-3. **Configurar SSL**: Habilitar Let's Encrypt automáticamente
-4. **Configurar Proxy**: Reverse proxy para servicios
-
-📖 **Guía Completa**: [Configuración Manual de Plesk](docs/PLESK_MANUAL_CONFIG.md)
-
-#### Deployment Automático
-
-Para deployment rápido, usa el script automatizado:
+### Desarrollo Local
 
 ```bash
-# Descargar y ejecutar script de deployment
-wget https://raw.githubusercontent.com/nodonorteit/wspbot/main/scripts/deployment/deploy.sh
-chmod +x deploy.sh
-./deploy.sh
-```
+# Instalar dependencias
+npm install
 
-## 🌐 URLs
-
-- **API Gateway**: http://localhost:8080
-- **Admin Panel**: http://localhost:3006
-- **Tenant Dashboard**: http://localhost:3007
-- **API Docs**: http://localhost:8080/docs
-- **phpMyAdmin**: http://localhost:8081 (desarrollo - solo con contenedor MySQL)
-
-## 🔐 Autenticación Multi-Tenant
-
-### **¿Cómo funciona la autenticación WhatsApp?**
-
-Cada tenant tiene su **propia sesión de WhatsApp independiente**:
-
-1. **Admin del Tenant** se loguea → JWT con `tenantId`
-2. Va a configuración → "Conectar WhatsApp"
-3. Sistema genera QR único para ese tenant
-4. Admin escanea QR con SU número de WhatsApp
-5. Sesión queda vinculada al tenant específico
-
-### **Flujo de Autenticación:**
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Tenant A      │    │   Tenant B      │    │   Tenant C      │
-│   (Clínica)     │    │   (Veterinaria) │    │   (Salón)       │
-└─────────┬───────┘    └─────────┬───────┘    └─────────┬───────┘
-          │                      │                      │
-          ▼                      ▼                      ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│ tenant_a_session│    │ tenant_b_session│    │ tenant_c_session│
-│   WhatsApp      │    │   WhatsApp      │    │   WhatsApp      │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
-
-### **Características:**
-
-- **JWT Tokens** con refresh tokens
-- **Multi-tenant isolation** por tenant_id
-- **Role-based access** (super-admin, tenant-admin, tenant-user, end-user)
-- **API Keys** para integraciones
-- **Sesiones WhatsApp independientes** por tenant
-- **Aislamiento completo** de datos entre tenants
-
-## 📊 Monitoreo
-
-- **Health checks** en cada servicio
-- **Métricas** con Prometheus
-- **Logs** centralizados
-- **Alertas** automáticas
-
-## 🚀 Deployment
-
-### Desarrollo
-```bash
+# Iniciar en modo desarrollo
 npm run dev
+
+# Iniciar en producción
+npm run start:all
 ```
 
-### Producción
-```bash
-npm run build
-npm run start:prod
+## 📋 Servicios
+
+### Auth Service (Puerto 3001)
+- Autenticación JWT
+- Registro de usuarios
+- Gestión de sesiones
+- Endpoint: `/api/auth/*`
+
+### WhatsApp Service (Puerto 3004)
+- Integración con WAHA
+- Gestión de sesiones WhatsApp por tenant
+- Envío de mensajes
+- Webhooks
+- Endpoint: `/api/sessions/*`
+
+### WAHA (Puerto 3000)
+- WhatsApp HTTP API
+- Administración de sesiones WhatsApp
+- Documentación: http://localhost:3000/docs
+
+### Redis (Puerto 6379)
+- Cache de sesiones
+- Colas de mensajes
+
+## 🔧 Configuración
+
+Crea un archivo `.env` basado en `env.example`:
+
+```env
+# Database
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=wspbot_auth
+DB_USER=wspbot
+DB_PASSWORD=password
+
+# JWT
+JWT_SECRET=your-super-secret-jwt-key
+
+# Redis
+REDIS_HOST=redis
+REDIS_PORT=6379
+
+# WAHA
+WAHA_BASE_URL=http://waha:3000
 ```
 
-### Docker
+## 📦 Estructura de Contenedores
+
+La aplicación corre en **3 contenedores**:
+1. **waha** - WhatsApp HTTP API
+2. **redis** - Cache y colas
+3. **wspbot-app** - Aplicación monolítica con todos los servicios
+
+## 🔄 Escalamiento
+
+Cada cliente puede tener su propio contenedor `wspbot-app`:
+
 ```bash
-docker-compose up -d
+docker-compose up -d --scale wspbot-app=3
 ```
 
-### Kubernetes
-```bash
-kubectl apply -f infrastructure/kubernetes/
-```
+## 📚 Documentación Adicional
+
+- [README.MONOLITH.md](./README.MONOLITH.md) - Guía detallada de la arquitectura monolítica
+- [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) - Guía de despliegue
+
+## 🛠️ Tecnologías
+
+- **Backend**: Node.js + TypeScript + Express
+- **Database**: MySQL 8.0 (opcional, externa)
+- **Cache**: Redis
+- **WhatsApp**: WAHA (devlikeapro/waha)
+- **Container**: Docker + Docker Compose
+- **Orquestation**: Concurrently para ejecutar múltiples servicios
+
+## 📄 Licencia
+
+MIT
+
+## 👤 Autor
+
+nodonorteit
+
+## 📞 Soporte
+
+Para más información, consulta la [documentación](./docs/) o abre un issue.

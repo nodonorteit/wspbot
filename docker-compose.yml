@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # WAHA - WhatsApp HTTP API
+  # WAHA - WhatsApp HTTP API (externa)
   waha:
     image: devlikeapro/waha
     container_name: waha
@@ -16,25 +16,6 @@ services:
     networks:
       - wspbot-network
 
-  # MySQL Database - Using hosting database instead of container
-  # mysql:
-  #   image: mysql:8.0
-  #   container_name: wspbot-mysql
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: rootpassword
-  #     MYSQL_DATABASE: wspbot
-  #     MYSQL_USER: wspbot
-  #     MYSQL_PASSWORD: password
-  #   ports:
-  #     - "3306:3306"
-  #   volumes:
-  #     - mysql_data:/var/lib/mysql
-  #     - ./infrastructure/mysql/init:/docker-entrypoint-initdb.d
-  #   restart: unless-stopped
-  #   networks:
-  #     - wspbot-network
-  #   command: --default-authentication-plugin=mysql_native_password
-
   # Redis Cache & Queue
   redis:
     image: redis:7-alpine
@@ -47,183 +28,32 @@ services:
     networks:
       - wspbot-network
 
-  # API Gateway
-  api-gateway:
+  # Aplicación monolítica - Todos los servicios en un solo contenedor
+  wspbot-app:
     build:
-      context: ./services/api-gateway
+      context: .
       dockerfile: Dockerfile
-    container_name: wspbot-api-gateway
+    container_name: wspbot-app
     ports:
-      - "8080:8080"
+      - "3001:3001"  # Auth Service
+      - "3004:3004"  # WhatsApp Service
     environment:
       - NODE_ENV=production
-      - PORT=8080
-      - AUTH_SERVICE_URL=http://auth-service:3001
-      - TENANT_SERVICE_URL=http://tenant-service:3002
-      - TURNS_SERVICE_URL=http://turns-service:3003
-      - WHATSAPP_SERVICE_URL=http://whatsapp-service:3004
-      - NOTIFICATIONS_SERVICE_URL=http://notifications-service:3005
-    depends_on:
-      - auth-service
-      - tenant-service
-      - turns-service
-      - whatsapp-service
-      - notifications-service
-    restart: unless-stopped
-    networks:
-      - wspbot-network
-
-  # Auth Service
-  auth-service:
-    build:
-      context: ./services/auth-service
-      dockerfile: Dockerfile
-    container_name: wspbot-auth-service
-    ports:
-      - "3001:3001"
-    environment:
-      - NODE_ENV=production
-      - PORT=3001
-      - DB_HOST=${DB_HOST:-localhost}
+      # Auth Service
+      - DB_HOST=${DB_HOST:-mysql}
       - DB_PORT=${DB_PORT:-3306}
       - DB_NAME=${DB_NAME:-wspbot_auth}
       - DB_USER=${DB_USER:-wspbot}
       - DB_PASSWORD=${DB_PASSWORD:-password}
-      - JWT_SECRET=your-super-secret-jwt-key-change-in-production
+      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+      # Redis
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-    depends_on:
-      - redis
-    restart: unless-stopped
-    networks:
-      - wspbot-network
-
-  # Tenant Service
-  tenant-service:
-    build:
-      context: ./services/tenant-service
-      dockerfile: Dockerfile
-    container_name: wspbot-tenant-service
-    ports:
-      - "3002:3002"
-    environment:
-      - NODE_ENV=production
-      - PORT=3002
-      - DB_HOST=${DB_HOST:-localhost}
-      - DB_PORT=${DB_PORT:-3306}
-      - DB_NAME=${DB_NAME:-wspbot_tenants}
-      - DB_USER=${DB_USER:-wspbot}
-      - DB_PASSWORD=${DB_PASSWORD:-password}
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-    depends_on:
-      - redis
-    restart: unless-stopped
-    networks:
-      - wspbot-network
-
-  # Turns Service
-  turns-service:
-    build:
-      context: ./services/turns-service
-      dockerfile: Dockerfile
-    container_name: wspbot-turns-service
-    ports:
-      - "3003:3003"
-    environment:
-      - NODE_ENV=production
-      - PORT=3003
-      - DB_HOST=${DB_HOST:-localhost}
-      - DB_PORT=${DB_PORT:-3306}
-      - DB_NAME=${DB_NAME:-wspbot_turns}
-      - DB_USER=${DB_USER:-wspbot}
-      - DB_PASSWORD=${DB_PASSWORD:-password}
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-    depends_on:
-      - redis
-    restart: unless-stopped
-    networks:
-      - wspbot-network
-
-  # WhatsApp Service
-  whatsapp-service:
-    build:
-      context: ./services/whatsapp-service
-      dockerfile: Dockerfile
-    container_name: wspbot-whatsapp-service
-    ports:
-      - "3004:3004"
-    environment:
-      - NODE_ENV=production
-      - PORT=3004
+      # WAHA
       - WAHA_BASE_URL=http://waha:3000
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
     depends_on:
       - waha
       - redis
-    restart: unless-stopped
-    networks:
-      - wspbot-network
-
-  # Notifications Service
-  notifications-service:
-    build:
-      context: ./services/notifications-service
-      dockerfile: Dockerfile
-    container_name: wspbot-notifications-service
-    ports:
-      - "3005:3005"
-    environment:
-      - NODE_ENV=production
-      - PORT=3005
-      - DB_HOST=${DB_HOST:-localhost}
-      - DB_PORT=${DB_PORT:-3306}
-      - DB_NAME=${DB_NAME:-wspbot_notifications}
-      - DB_USER=${DB_USER:-wspbot}
-      - DB_PASSWORD=${DB_PASSWORD:-password}
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - WHATSAPP_SERVICE_URL=http://whatsapp-service:3004
-    depends_on:
-      - redis
-      - whatsapp-service
-    restart: unless-stopped
-    networks:
-      - wspbot-network
-
-  # phpMyAdmin (Development only) - Disabled when using hosting database
-  # phpmyadmin:
-  #   image: phpmyadmin/phpmyadmin
-  #   container_name: wspbot-phpmyadmin
-  #   ports:
-  #     - "8081:80"
-  #   environment:
-  #     PMA_HOST: mysql
-  #     PMA_USER: wspbot
-  #     PMA_PASSWORD: password
-  #   depends_on:
-  #     - mysql
-  #   restart: unless-stopped
-  #   networks:
-  #     - wspbot-network
-  #   profiles:
-  #     - dev
-
-  # Admin Panel Frontend
-  admin-panel:
-    build:
-      context: ./frontend/admin-panel
-      dockerfile: Dockerfile
-    container_name: wspbot-admin-panel
-    ports:
-      - "3006:3006"
-    environment:
-      - NODE_ENV=production
-      - REACT_APP_API_URL=http://localhost:8080
-    depends_on:
-      - api-gateway
     restart: unless-stopped
     networks:
       - wspbot-network

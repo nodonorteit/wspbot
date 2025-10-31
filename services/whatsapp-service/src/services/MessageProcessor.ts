@@ -1,5 +1,5 @@
 import { logger } from '../utils/logger';
-import { WhatsAppMessage } from '../../../shared/types';
+import { WhatsAppMessage } from '@wspbot/shared-types';
 
 export class MessageProcessor {
   constructor() {}
@@ -37,7 +37,7 @@ export class MessageProcessor {
       }
 
       // Forward to other services if needed
-      await this.forwardToTurnService(tenantId, message);
+      await this.forwardToTurnService(tenantId, message, 'message_received');
 
     } catch (error) {
       logger.error(`Error processing incoming message for tenant ${tenantId}:`, error);

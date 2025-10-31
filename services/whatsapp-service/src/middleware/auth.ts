@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { config } from '../config';
 import { logger } from '../utils/logger';
 import { User, UserRole } from '@wspbot/shared-types';
 
@@ -13,6 +12,9 @@ declare global {
     }
   }
 }
+
+// Configuration - in a real app, this would come from config
+const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   try {
@@ -29,7 +31,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
 
     const token = authHeader.substring(7); // Remove 'Bearer ' prefix
     
-    const decoded = jwt.verify(token, config.jwt.secret) as any;
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
     
     // Add user info to request
     req.user = {

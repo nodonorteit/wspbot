@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { ServiceConfig, WhatsAppConfig } from '../../../shared/types';
+import { ServiceConfig, WhatsAppConfig } from '@wspbot/shared-types';
 
 dotenv.config();
 

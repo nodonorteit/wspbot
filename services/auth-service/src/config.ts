@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { ServiceConfig } from '../../../shared/types';
+import { ServiceConfig } from '@wspbot/shared-types';
 
 dotenv.config();
 

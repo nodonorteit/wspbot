@@ -1,0 +1,97 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'docker-compose*.yml'
+      - 'env.production'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - staging
+
+env:
+  HUAWEI_REGION: cn-north-4
+  HUAWEI_NAMESPACE: ${{ secrets.HUAWEI_NAMESPACE }}
+  HUAWEI_ACCESS_KEY_ID: ${{ secrets.HUAWEI_ACCESS_KEY_ID }}
+  HUAWEI_SECRET_ACCESS_KEY: ${{ secrets.HUAWEI_SECRET_ACCESS_KEY }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        
+    - name: Deploy to server
+      run: |
+        # Crear directorio de deployment
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_HOST }} "
+          mkdir -p /var/www/wspbot
+          cd /var/www/wspbot
+          
+          # Detener servicios existentes
+          docker-compose -f docker-compose.plesk.yml down || true
+          
+          # Actualizar código
+          git fetch origin
+          git reset --hard origin/main
+          
+          # Actualizar docker-compose con namespace correcto
+          sed -i 's/tu-namespace/${{ env.HUAWEI_NAMESPACE }}/g' docker-compose.plesk.yml
+          
+          # Copiar variables de entorno
+          cp env.production .env
+          
+          # Login en Huawei Cloud Registry
+          echo '${{ env.HUAWEI_SECRET_ACCESS_KEY }}' | docker login swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com -u '${{ env.HUAWEI_ACCESS_KEY_ID }}' --password-stdin
+          
+          # Levantar servicios
+          docker-compose -f docker-compose.plesk.yml pull
+          docker-compose -f docker-compose.plesk.yml up -d
+          
+          # Limpiar imágenes no utilizadas
+          docker image prune -f
+        "
+        
+    - name: Health Check
+      run: |
+        # Esperar a que los servicios estén listos
+        sleep 30
+        
+        # Verificar que los servicios estén corriendo
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_HOST }} "
+          docker-compose -f /var/www/wspbot/docker-compose.plesk.yml ps
+          
+          # Health check básico
+          curl -f http://localhost:8080/health || echo 'API Gateway not ready'
+          curl -f http://localhost:3000/api/sessions || echo 'WAHA not ready'
+        "
+        
+    - name: Notify deployment
+      run: |
+        echo "🚀 Deployment completed successfully!"
+        echo "📋 Services deployed:"
+        echo "  - API Gateway: http://${{ secrets.SERVER_HOST }}:8080"
+        echo "  - WAHA: http://${{ secrets.SERVER_HOST }}:3000"
+        echo "  - Admin Panel: http://${{ secrets.SERVER_HOST }}:3006"
+        echo ""
+        echo "🔗 Next steps:"
+        echo "  1. Configure domains in Plesk"
+        echo "  2. Setup SSL certificates"
+        echo "  3. Configure reverse proxy"
+        echo "  4. Test the system"

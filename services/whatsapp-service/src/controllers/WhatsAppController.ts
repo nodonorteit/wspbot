@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { SessionManager } from '../services/SessionManager';
 import { MessageProcessor } from '../services/MessageProcessor';
 import { logger } from '../utils/logger';
-import { ApiResponse } from '../../../shared/types';
+import { ApiResponse } from '@wspbot/shared-types';
 
 export class WhatsAppController {
   constructor(

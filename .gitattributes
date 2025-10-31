@@ -1,0 +1,24 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Shell scripts should always use LF
+*.sh text eol=lf
+
+# Package files
+*.json text
+*.js text
+*.ts text
+*.yml text
+*.yaml text
+
+# Config files
+.env.example text
+*.config.* text
+
+# Documentation
+*.md text
+
+# Docker
+Dockerfile text
+docker-compose*.yml text
+.dockerignore text

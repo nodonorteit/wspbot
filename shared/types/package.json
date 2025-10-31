@@ -1,0 +1,11 @@
+{
+  "name": "@wspbot/shared-types",
+  "version": "1.0.0",
+  "description": "Shared types for WSPBot microservices",
+  "main": "index.ts",
+  "types": "index.ts",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "scripts": {}
+}

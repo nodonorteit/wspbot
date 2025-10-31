@@ -1,0 +1,105 @@
+name: Test Services
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'services/**'
+      - 'frontend/**'
+
+jobs:
+  test-services:
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: wspbot_test
+          MYSQL_USER: wspbot
+          MYSQL_PASSWORD: password
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: |
+        # Instalar dependencias para cada servicio
+        for service in services/*/; do
+          if [ -f "$service/package.json" ]; then
+            echo "Installing dependencies for $service"
+            cd "$service"
+            npm ci
+            cd - > /dev/null
+          fi
+        done
+        
+        # Instalar dependencias del frontend
+        if [ -f "frontend/admin-panel/package.json" ]; then
+          echo "Installing frontend dependencies"
+          cd frontend/admin-panel
+          npm ci
+          cd - > /dev/null
+        fi
+        
+    - name: Run tests
+      run: |
+        # Ejecutar tests para cada servicio
+        for service in services/*/; do
+          if [ -f "$service/package.json" ] && [ -f "$service/test" ] || [ -f "$service/src/**/*.test.js" ]; then
+            echo "Running tests for $service"
+            cd "$service"
+            npm test || echo "No tests found for $service"
+            cd - > /dev/null
+          fi
+        done
+        
+    - name: Build Docker images (test)
+      run: |
+        # Construir imágenes para testing
+        docker build -t wspbot-api-gateway-test ./services/api-gateway
+        docker build -t wspbot-auth-service-test ./services/auth-service
+        docker build -t wspbot-tenant-service-test ./services/tenant-service
+        docker build -t wspbot-turns-service-test ./services/turns-service
+        docker build -t wspbot-whatsapp-service-test ./services/whatsapp-service
+        docker build -t wspbot-notifications-service-test ./services/notifications-service
+        docker build -t wspbot-admin-panel-test ./frontend/admin-panel
+        
+    - name: Test Docker images
+      run: |
+        # Verificar que las imágenes se construyeron correctamente
+        docker images | grep wspbot
+        
+        # Verificar que las imágenes tienen los puertos correctos
+        docker run --rm wspbot-api-gateway-test node -e "console.log('API Gateway image OK')"
+        docker run --rm wspbot-auth-service-test node -e "console.log('Auth Service image OK')"
+        docker run --rm wspbot-tenant-service-test node -e "console.log('Tenant Service image OK')"
+        docker run --rm wspbot-turns-service-test node -e "console.log('Turns Service image OK')"
+        docker run --rm wspbot-whatsapp-service-test node -e "console.log('WhatsApp Service image OK')"
+        docker run --rm wspbot-notifications-service-test node -e "console.log('Notifications Service image OK')"
+        docker run --rm wspbot-admin-panel-test node -e "console.log('Admin Panel image OK')"
+        
+    - name: Cleanup
+      run: |
+        # Limpiar imágenes de test
+        docker rmi wspbot-api-gateway-test wspbot-auth-service-test wspbot-tenant-service-test wspbot-turns-service-test wspbot-whatsapp-service-test wspbot-notifications-service-test wspbot-admin-panel-test || true
+

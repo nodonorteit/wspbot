@@ -8,8 +8,6 @@ import { config } from './config';
 import { logger } from './utils/logger';
 import { errorHandler } from './middleware/errorHandler';
 import { authRoutes } from './routes/auth';
-import { userRoutes } from './routes/users';
-import { tenantRoutes } from './routes/tenants';
 
 const app = express();
 
@@ -47,8 +45,6 @@ app.get('/health', (req, res) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/tenants', tenantRoutes);
 
 // Error handling
 app.use(errorHandler);
