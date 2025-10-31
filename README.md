@@ -39,17 +39,18 @@ ssh usuario@tu-servidor.com
 # 2. Clonar y configurar
 git clone https://github.com/nodonorteit/wspbot.git
 cd wspbot
-./setup.sh
 
 # 3. Configurar variables
 cp env.example .env
-nano .env
+nano .env  # Editar .env
 
-# 4. Desplegar
-./deploy.sh
+# 4. Login y desplegar desde Huawei Cloud
+docker login swr.cn-north-4.myhuaweicloud.com
+./deploy-huawei.sh
 ```
 
-**📖 [Ver guía completa de VPS →](DEPLOY_TO_SERVER.md)**
+**📖 [Ver guía Huawei Cloud →](HUAWEI_CLOUD_DEPLOY.md)**  
+**📖 [Ver guía VPS genérica →](DEPLOY_TO_SERVER.md)**
 
 ## 📋 Estructura
 
@@ -96,6 +97,7 @@ Antes de producción:
 
 ## 📖 Documentación
 
+- **[HUAWEI_CLOUD_DEPLOY.md](HUAWEI_CLOUD_DEPLOY.md)** - Despliegue con Huawei Cloud ⭐
 - **[PLESK_DEPLOYMENT.md](PLESK_DEPLOYMENT.md)** - Despliegue en Plesk
 - **[DEPLOY_TO_SERVER.md](DEPLOY_TO_SERVER.md)** - Despliegue en VPS
 - **[README_PLESK.md](README_PLESK.md)** - Guía rápida Plesk

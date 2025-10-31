@@ -1,11 +1,13 @@
-name: Build and Push Docker Images to Huawei Cloud
+name: Build and Push Docker Image to Huawei Cloud
 
 on:
   push:
     branches: [ main, develop ]
     paths:
       - 'services/**'
-      - 'frontend/**'
+      - 'shared/**'
+      - 'package.json'
+      - 'Dockerfile'
       - 'docker-compose*.yml'
   pull_request:
     branches: [ main ]
@@ -14,7 +16,7 @@ on:
 env:
   HUAWEI_REGION: cn-north-4
   HUAWEI_NAMESPACE: ${{ secrets.HUAWEI_NAMESPACE }}
-  IMAGE_PREFIX: wspbot
+  IMAGE_NAME: wspbot-app
   VERSION: ${{ github.sha }}
   HUAWEI_ACCESS_KEY_ID: ${{ secrets.HUAWEI_ACCESS_KEY_ID }}
   HUAWEI_SECRET_ACCESS_KEY: ${{ secrets.HUAWEI_SECRET_ACCESS_KEY }}
@@ -37,91 +39,22 @@ jobs:
         username: ${{ env.HUAWEI_ACCESS_KEY_ID }}
         password: ${{ env.HUAWEI_SECRET_ACCESS_KEY }}
         
-    - name: Build and push API Gateway
+    - name: Build and push WSPBot App
       uses: docker/build-push-action@v5
       with:
-        context: ./services/api-gateway
+        context: .
+        file: ./Dockerfile
         push: true
         tags: |
-          swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_PREFIX }}-api-gateway:${{ env.VERSION }}
-          swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_PREFIX }}-api-gateway:latest
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        
-    - name: Build and push Auth Service
-      uses: docker/build-push-action@v5
-      with:
-        context: ./services/auth-service
-        push: true
-        tags: |
-          swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_PREFIX }}-auth-service:${{ env.VERSION }}
-          swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_PREFIX }}-auth-service:latest
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        
-    - name: Build and push Tenant Service
-      uses: docker/build-push-action@v5
-      with:
-        context: ./services/tenant-service
-        push: true
-        tags: |
-          swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_PREFIX }}-tenant-service:${{ env.VERSION }}
-          swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_PREFIX }}-tenant-service:latest
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        
-    - name: Build and push Turns Service
-      uses: docker/build-push-action@v5
-      with:
-        context: ./services/turns-service
-        push: true
-        tags: |
-          swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_PREFIX }}-turns-service:${{ env.VERSION }}
-          swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_PREFIX }}-turns-service:latest
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        
-    - name: Build and push WhatsApp Service
-      uses: docker/build-push-action@v5
-      with:
-        context: ./services/whatsapp-service
-        push: true
-        tags: |
-          swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_PREFIX }}-whatsapp-service:${{ env.VERSION }}
-          swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_PREFIX }}-whatsapp-service:latest
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        
-    - name: Build and push Notifications Service
-      uses: docker/build-push-action@v5
-      with:
-        context: ./services/notifications-service
-        push: true
-        tags: |
-          swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_PREFIX }}-notifications-service:${{ env.VERSION }}
-          swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_PREFIX }}-notifications-service:latest
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        
-    - name: Build and push Admin Panel
-      uses: docker/build-push-action@v5
-      with:
-        context: ./frontend/admin-panel
-        push: true
-        tags: |
-          swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_PREFIX }}-admin-panel:${{ env.VERSION }}
-          swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_PREFIX }}-admin-panel:latest
+          swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
+          swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_NAME }}:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
         
     - name: Update deployment info
       run: |
-        echo "🎉 Images built and pushed successfully!"
-        echo "📋 Images available:"
-        echo "  - swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_PREFIX }}-api-gateway:${{ env.VERSION }}"
-        echo "  - swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_PREFIX }}-auth-service:${{ env.VERSION }}"
-        echo "  - swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_PREFIX }}-tenant-service:${{ env.VERSION }}"
-        echo "  - swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_PREFIX }}-turns-service:${{ env.VERSION }}"
-        echo "  - swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_PREFIX }}-whatsapp-service:${{ env.VERSION }}"
-        echo "  - swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_PREFIX }}-notifications-service:${{ env.VERSION }}"
-        echo "  - swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_PREFIX }}-admin-panel:${{ env.VERSION }}"
+        echo "🎉 Image built and pushed successfully!"
+        echo ""
+        echo "📋 Image available:"
+        echo "  swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}"
+        echo "  swr.${{ env.HUAWEI_REGION }}.myhuaweicloud.com/${{ env.HUAWEI_NAMESPACE }}/${{ env.IMAGE_NAME }}:latest"

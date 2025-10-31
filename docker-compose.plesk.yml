@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # WAHA - WhatsApp HTTP API (externa)
+  waha:
+    image: devlikeapro/waha
+    container_name: wspbot-waha
+    ports:
+      - "3000:3000"
+    environment:
+      - WAHA_ENGINE=WEBJS
+      - WAHA_LOG_LEVEL=info
+    volumes:
+      - waha_data:/app/.waha
+    restart: unless-stopped
+    networks:
+      - wspbot-network
+
+  # Redis Cache & Queue
+  redis:
+    image: redis:7-alpine
+    container_name: wspbot-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - wspbot-network
+
+  # Aplicación monolítica desde Huawei Cloud Registry
+  wspbot-app:
+    image: swr.cn-north-4.myhuaweicloud.com/tu-namespace/wspbot-app:latest
+    container_name: wspbot-app
+    ports:
+      - "3001:3001"  # Auth Service
+      - "3004:3004"  # WhatsApp Service
+    environment:
+      - NODE_ENV=production
+      # Auth Service
+      - DB_HOST=${DB_HOST:-localhost}
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_NAME=${DB_NAME:-wspbot_auth}
+      - DB_USER=${DB_USER:-wspbot}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
+      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+      # Redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      # WAHA
+      - WAHA_BASE_URL=http://waha:3000
+    depends_on:
+      - waha
+      - redis
+    restart: unless-stopped
+    networks:
+      - wspbot-network
+
+volumes:
+  waha_data:
+  redis_data:
+
+networks:
+  wspbot-network:
+    driver: bridge
+
