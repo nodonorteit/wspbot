@@ -1,8 +1,9 @@
 {
-  "name": "wspbot-monolithic",
+  "name": "wspbot",
   "version": "1.0.0",
-  "description": "WhatsApp Bot Multi-Tenant - Monolithic Architecture",
+  "description": "WhatsApp Bot Multi-Tenant - Unified Monolithic Architecture",
   "private": true,
+  "main": "app.js",
   "workspaces": [
     "services/*",
     "shared/types"
@@ -10,18 +11,37 @@
   "scripts": {
     "build": "npm run build:services",
     "build:services": "cd services/auth-service && npm run build && cd ../whatsapp-service && npm run build && cd ../..",
+    "start": "node app.js",
     "start:all": "concurrently \"npm run start --workspace=services/auth-service\" \"npm run start --workspace=services/whatsapp-service\" --names \"AUTH,WAHA\" --prefix name --prefix-colors \"blue.bold,yellow.bold\"",
+    "dev": "node app.js",
     "dev:auth": "npm run dev --workspace=services/auth-service",
     "dev:whatsapp": "npm run dev --workspace=services/whatsapp-service",
-    "dev": "concurrently \"npm run dev:auth\" \"npm run dev:whatsapp\"",
     "docker:build": "docker-compose build",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f"
   },
   "dependencies": {
+    "axios": "^1.6.2",
+    "bcryptjs": "^2.4.3",
+    "bull": "^4.12.2",
+    "compression": "^1.7.4",
     "concurrently": "^8.2.2",
-    "typescript": "^5.3.2"
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.1.0",
+    "joi": "^17.11.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "qrcode": "^1.5.3",
+    "redis": "^4.6.10",
+    "typescript": "^5.3.2",
+    "winston": "^3.11.0",
+    "ws": "^8.14.2"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",

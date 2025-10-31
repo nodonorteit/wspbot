@@ -1,0 +1,11 @@
+# Plesk Node.js configuration
+# Redirect all requests to Node.js app
+
+RewriteEngine On
+RewriteRule ^(.*)$ http://localhost:$PORT/$1 [P,L]
+
+# O si prefieres, proxy to Node.js directamente
+# ProxyPreserveHost On
+# ProxyPass / http://localhost:$PORT/
+# ProxyPassReverse / http://localhost:$PORT/
+
