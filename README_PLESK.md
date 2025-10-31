@@ -1,42 +1,39 @@
-# 🎯 WSPBot para Plesk - Guía Rápida
+# ⚡ WSPBot para Plesk - Quick Start
 
-## ⚡ Instalación en 3 Pasos
+## Instalación en 3 pasos
 
-### 1️⃣ Subir Código
+### 1️⃣ Subir código
 
-**Por SSH:**
 ```bash
+ssh usuario@tu-servidor.com
 cd /var/www/vhosts/tudominio.com/httpdocs
 git clone https://github.com/nodonorteit/wspbot.git .
 npm install
 ```
 
-**Por File Manager:**
-- Sube todos los archivos a `httpdocs`
-
 ### 2️⃣ Configurar en Plesk
 
-1. Abre tu dominio en Plesk
-2. Ve a **"Node.js"**
-3. Configura:
-   - ✅ Habilitar Node.js
-   - 📄 Application Startup File: `app.js`
-   - 🏠 Application Root: `/`
-4. Click **"Run npm install"**
-5. Click **"Restart application"**
+- Ve a tu dominio → **Node.js**
+- ✅ Habilitar Node.js
+- 📄 Application Startup File: `app.js`
+- 🏠 Application Root: `/`
+- Click **"Run npm install"**
+- Click **"Restart application"**
 
-### 3️⃣ Variables de Entorno
+### 3️⃣ Variables de entorno
 
-Crea `.env` o agrégala en Plesk:
+En Plesk Node.js → Variables:
 
 ```env
 NODE_ENV=production
-JWT_SECRET=tu-clave-secreta
+JWT_SECRET=tu-clave-secreta-generar
 DB_HOST=localhost
-DB_NAME=tu_bd
-DB_USER=tu_usuario
-DB_PASSWORD=tu_password
+DB_NAME=nombre_bd
+DB_USER=usuario_bd
+DB_PASSWORD=password_bd
 ```
+
+**Generar JWT_SECRET:** `openssl rand -base64 32`
 
 ## ✅ Verificar
 
@@ -44,22 +41,24 @@ DB_PASSWORD=tu_password
 curl https://tudominio.com/health
 ```
 
-## 📖 Documentación Completa
+## 🐛 Problemas
 
-📚 **[PLESK_DEPLOYMENT.md](./PLESK_DEPLOYMENT.md)** - Guía detallada paso a paso
+**App no inicia:**
+```bash
+tail -f ~/logs/nodejs.log
+```
 
-## 🆘 Problemas
+**Reinstalar dependencias:**
+```bash
+rm -rf node_modules package-lock.json
+npm install
+```
 
-**La app no inicia:**
-- Ver logs: `tail -f ~/logs/nodejs.log`
-- Verificar Node.js >= 18
-- Reinstalar: `npm install`
+## 📚 Documentación
 
-**Puerto ocupado:**
-- Plesk lo configura automáticamente
-- No cambies PORT en .env
+- **[PLESK_DEPLOYMENT.md](PLESK_DEPLOYMENT.md)** - Guía completa detallada
+- **[README.md](README.md)** - Documentación general
 
 ---
 
-✅ **¡Listo! Tu bot está corriendo en Plesk** 🎉
-
+✅ ¡Listo! Bot corriendo en Plesk 🎉

@@ -16,11 +16,12 @@ dist/
 build/
 *.tsbuildinfo
 
-# Compiled files
+# Compiled files (except main app.js)
 **/*.d.ts
 **/*.d.ts.map
-**/*.js
-**/*.js.map
+**/dist/**/*.js
+**/dist/**/*.js.map
+!app.js
 
 # Logs
 logs/
